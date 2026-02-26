@@ -9,12 +9,14 @@ import Home from './pages/Home'
 import AddDoctor from './pages/AddDoctor'
 import EditDoctor from './pages/EditDoctor' 
 import useGetCurrentUser from './hooks/UseGetCurrentUser'
+import useGetDoctors from './hooks/useGetDoctors'
 
 export const serverUrl = 'http://localhost:8080';
 
 const App = () => {
 
   useGetCurrentUser();
+  useGetDoctors();
 
   const { userData } = useSelector(state => state.user);
 
@@ -53,7 +55,7 @@ const App = () => {
       />
 
       <Route
-        path='/edit-doctor/:doctorId'
+        path='/edit-doctor/:docId'
         element={
           userData && userData.role === "owner"
             ? <EditDoctor />
