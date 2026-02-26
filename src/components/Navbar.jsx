@@ -11,7 +11,7 @@ function Navbar() {
   const [showMenu, setShowMenu] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   const handleLogout = async () => {
     try {
       await axios.get("http://localhost:8080/api/auth/signOut", {
@@ -49,7 +49,7 @@ function Navbar() {
             </button>
 
             <button
-              onClick={() => navigate("/doctors")}
+              onClick={() => navigate("/")}
               className="text-[#2563EB] font-medium hover:text-[#1E40AF]"
             >
               View Doctors
@@ -61,7 +61,7 @@ function Navbar() {
         {userData?.role === "user" && (
           <>
             <button
-              onClick={() => navigate("/book")}
+              onClick={() => navigate("/")}
               className="text-[#2563EB] font-medium hover:text-[#1E40AF]"
             >
               Book Appointment

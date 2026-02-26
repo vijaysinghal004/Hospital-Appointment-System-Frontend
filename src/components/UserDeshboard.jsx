@@ -1,182 +1,148 @@
-// import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
 import Navbar from './Navbar'
-// import { categories } from '../Category'
-// import CategoryCard from './CategoryCard'
-// import { FaChevronCircleLeft } from "react-icons/fa";
-// import { FaChevronCircleRight } from "react-icons/fa";
-// import { useSelector } from 'react-redux';
-// import FoodCard from './FoodCard';
-
-
-// const UserDeshboard = () => {
-//   const { city, shopInMyCity ,itemInMyCity} = useSelector(state => state.user)
-//   const cateScrollRef = useRef();
-//   const shopScrollRef = useRef();
-//   const [showRightCateButton, setShowRightCateButton] = useState(false)
-//   const [showLeftCateButton, setShowLeftCateButton] = useState(false)
-//   const [showRightShopButton, setShowRightShopButton] = useState(false)
-//   const [showLeftShopButton, setShowLeftShopButton] = useState(false)
-
-
-
-//   const updateButton = (ref, setLeftButton, setRightButton) => {
-//     const element = ref.current
-//     if (element) {
-//       setLeftButton(element.scrollLeft > 0)
-//       setRightButton(element.scrollLeft + element.clientWidth < element.scrollWidth - 1)
-//       // console.log(element.scrollLeft+element.clientWidth)
-//       // console.log(element.scrollWidth)
-//       // console.log(element.scrollLeft+element.clientWidth<element.scrollWidth-1)
-//       // console.log(element.scrollLeft)
-//       // console.log(element.scrollWidth)
-//       // console.log(element.clientWidth)
-//     }
-//   }
-//   // useEffect(()=>{
-//   //   if(cateScrollRef.current){
-//   //       updateButton(cateScrollRef,setShowLeftCateButton,setShowRightCateButton)
-//   //     cateScrollRef.current.addEventListener('scroll',()=>{
-//   //       updateButton(cateScrollRef,setShowLeftCateButton,setShowRightCateButton)
-//   //     })
-//   //   }
-//   //   return ()=> cateScrollRef.current.removeEventListener('scroll',()=>{
-//   //       updateButton(cateScrollRef,setShowLeftCateButton,setShowRightCateButton)
-//   //     })
-//   // },[categories])
-//   // useEffect(() => {
-//   //   const element = cateScrollRef.current;
-//   //   if (!element) return;
-
-//   //   const handleScroll = () => {
-//   //     updateButton(cateScrollRef, setShowLeftCateButton, setShowRightCateButton);
-//   //   };
-
-//   //   // Initial check
-//   //   updateButton(cateScrollRef, setShowLeftCateButton, setShowRightCateButton);
-
-//   //   element.addEventListener("scroll", handleScroll);
-
-//   //   return () => {
-//   //     element.removeEventListener("scroll", handleScroll);
-//   //   };
-//   // }, []);
-//   useEffect(() => {
-//     const setupScroll = (ref, setLeft, setRight) => {
-//       const element = ref.current;
-//       if (!element) return;
-
-//       const handleScroll = () => {
-//         updateButton(ref, setLeft, setRight);
-//       };
-
-//       // Initial check
-//       updateButton(ref, setLeft, setRight);
-
-//       element.addEventListener("scroll", handleScroll);
-
-//       return () => {
-//         element.removeEventListener("scroll", handleScroll);
-//       };
-//     };
-
-//     const cleanupCate = setupScroll(
-//       cateScrollRef,
-//       setShowLeftCateButton,
-//       setShowRightCateButton
-//     );
-
-//     const cleanupShop = setupScroll(
-//       shopScrollRef,
-//       setShowLeftShopButton,
-//       setShowRightShopButton
-//     );
-
-//     return () => {
-//       cleanupCate && cleanupCate();
-//       cleanupShop && cleanupShop();
-//     };
-//   }, []);
-
-
-//   const ScrollHandler = (ref, direction) => {
-//     if (ref.current) {
-//       ref.current.scrollBy({
-//         left: direction == 'left' ? -200 : 200,
-//         behavior: "smooth"
-//       })
-//     }
-//   }
-
-//   return (
-//     <div className='w-screen min-h-screen flex flex-col gap-5 items-center bg-[#fff9f6]'>
-//       <Navbar />
-//       <div className='w-full max-w-6xl flex flex-col gap-5 items-start p-[10px]'>
-//         <h1 className='text-gray-800 text-2xl sm:text-3xl'>Inspiration for your first order</h1>
-//         <div className='w-full relative'>
-//           {showLeftCateButton &&
-//             <button className='absolute left-0 top-1/2 -translate-y-1/2 bg-[#ff4d2d] text-white p-2 rounded-full shadow-lg hover:bg-[#e64528] z-10 ' onClick={() => ScrollHandler(cateScrollRef, "left")}>
-//               <FaChevronCircleLeft />
-//             </button>
-//           }
-//           <div className='w-full flex overflow-x-auto gap-4 pb-2 ' ref={cateScrollRef}>
-//             {categories.map((cate, index) => (
-//               <CategoryCard name={cate.category} image={cate.image} key={index} />
-//             ))}
-//           </div>
-//           {showRightCateButton &&
-//             <button className='absolute right-0 top-1/2 -translate-y-1/2 bg-[#ff4d2d] text-white p-2 rounded-full shadow-lg hover:bg-[#e64528] z-10 ' onClick={() => ScrollHandler(cateScrollRef, "right")}>
-//               <FaChevronCircleRight />
-//             </button>
-//           }
-//         </div>
-//       </div>
-//       <div className='w-full max-w-6xl flex flex-col gap-5 items-start p-[10px]'>
-//         <h1 className='text-gray-800 text-2xl sm:text-3xl'>Best Shop in {city}</h1>
-//         <div className='w-full relative'>
-//           {showLeftShopButton &&
-//             <button className='absolute left-0 top-1/2 -translate-y-1/2 bg-[#ff4d2d] text-white p-2 rounded-full shadow-lg hover:bg-[#e64528] z-10 ' onClick={() => ScrollHandler(shopScrollRef, "left")}>
-//               <FaChevronCircleLeft />
-//             </button>
-//           }
-//           <div className='w-full flex overflow-x-auto gap-4 pb-2 ' ref={shopScrollRef}>
-//             {shopInMyCity?.map((shop, index) => (
-//               <CategoryCard name={shop.name} image={shop.image} key={index} />
-//             ))}
-//           </div>
-//           {showRightShopButton &&
-//             <button className='absolute right-0 top-1/2 -translate-y-1/2 bg-[#ff4d2d] text-white p-2 rounded-full shadow-lg hover:bg-[#e64528] z-10 ' onClick={() => ScrollHandler(shopScrollRef, "right")}>
-//               <FaChevronCircleRight />
-//             </button>
-//           }
-//         </div>
-//       </div>
-
-//       {/* all items */}
-//       <div className='w-full max-w-6xl flex flex-col gap-5 items-start p-[10px]'>
-//         <h1 className='text-gray-800 text-2xl sm:text-3xl'>Suggest Food Items </h1>
-//         <div className='w-full h-auto flex flex-wrap gap-[20px] justify-center'>
-//    {itemInMyCity.map((item,index)=>(
-//     <FoodCard key={index} data={item}/>
-//    ))}
-//         </div>
-
-//       </div>
-
-//     </div>
-
-//   )
-// }
-
-// export default UserDeshboard
-import React from 'react'
+import axios from 'axios'
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const UserDeshboard = () => {
+
+  const doctors = useSelector(state => state.user?.doctors) || []
+
+  const [successMessage, setSuccessMessage] = useState("")
+  const [errorMessage, setErrorMessage] = useState("")
+  const [loadingId, setLoadingId] = useState(null);
+
+  const handleBooking = async (specialization, doctorId) => {
+    try {
+      setLoadingId(doctorId)
+
+      const res = await axios.post(
+        "http://localhost:8080/api/doctor/book-appointment",
+        { specialization },
+        { withCredentials: true }
+      )
+
+      console.log(res.data); // ✅ fixed
+
+      setSuccessMessage(res.data.message)
+      setErrorMessage("")
+
+      setTimeout(() => {
+        setSuccessMessage("")
+      }, 3000)
+
+    } catch (err) {
+      setErrorMessage(err.response?.data?.message || "Booking failed")
+      setSuccessMessage("")
+
+      setTimeout(() => {
+        setErrorMessage("")
+      }, 3000)
+    } finally {
+      setLoadingId(null)
+    }
+  }
+
   return (
-    <div className='w-screen min-h-screen flex flex-col gap-5 items-center bg-[#fff9f6]'>
-<Navbar/>      
+    <div className='w-screen min-h-screen bg-[#fff9f6]'>
+      <Navbar />
+
+      <div className='p-10'>
+        <h1 className='text-3xl font-bold mb-6 text-center'>
+          Book Appointment
+        </h1>
+
+        {successMessage && (
+          <div className="bg-green-100 text-green-700 px-4 py-3 rounded-lg mb-6 text-center font-medium">
+            {successMessage}
+          </div>
+        )}
+
+        {errorMessage && (
+          <div className="bg-red-100 text-red-700 px-4 py-3 rounded-lg mb-6 text-center font-medium">
+            {errorMessage}
+          </div>
+        )}
+
+        {doctors.length === 0 ? (
+          <p className='text-center text-gray-500'>No Doctors Found</p>
+        ) : (
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+            {doctors.map((doctor) => {
+
+              const isBusy =
+                doctor.currentAppointments >= doctor.maxDailyPatients
+
+              return (
+                <div
+                  key={doctor._id}
+                  className='bg-white shadow-md rounded-xl p-5 hover:shadow-xl transition'
+                >
+                  <img
+                    src={doctor.image}
+                    alt="doctor"
+                    className='w-full h-48 object-cover rounded-lg mb-4'
+                  />
+
+                  <h2 className='text-xl font-semibold'>
+                    Dr. {doctor.name}
+                  </h2>
+
+                  <p className='text-gray-600'>
+                    {doctor.specialization}
+                  </p>
+
+                  <p className='text-gray-500 text-sm mt-1'>
+                    Experience: {doctor.experience} years
+                  </p>
+
+                  <p className='text-gray-500 text-sm'>
+                    Fee: ₹{doctor.consultationFee}
+                  </p>
+
+                  <p className='text-gray-500 text-sm'>
+                    Appointments: {doctor.currentAppointments} / {doctor.maxDailyPatients}
+                  </p>
+
+                  <div className='mt-4'>
+                    {isBusy ? (
+                      <button
+                        disabled
+                        className='w-full bg-red-100 text-red-600 py-2 rounded-lg cursor-not-allowed'
+                      >
+                        Fully Booked
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() =>
+                          handleBooking(doctor.specialization, doctor._id)
+                        }
+                        disabled={loadingId === doctor._id}
+                        className={`w-full py-2 rounded-lg text-white flex items-center justify-center gap-2 transition ${
+                          loadingId === doctor._id
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-green-600 hover:bg-green-700"
+                        }`}
+                      >
+                        {loadingId === doctor._id ? (
+                          <>
+                            <AiOutlineLoading3Quarters className="animate-spin text-lg" />
+                            Booking...
+                          </>
+                        ) : (
+                          "Book Appointment"
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
 
 export default UserDeshboard
-

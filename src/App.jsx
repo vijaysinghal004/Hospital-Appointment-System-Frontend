@@ -10,6 +10,8 @@ import AddDoctor from './pages/AddDoctor'
 import EditDoctor from './pages/EditDoctor' 
 import useGetCurrentUser from './hooks/UseGetCurrentUser'
 import useGetDoctors from './hooks/useGetDoctors'
+import MyAppointments from './components/MyAppointments '
+import useGetAppointments from './hooks/UseGetAppointments'
 
 export const serverUrl = 'http://localhost:8080';
 
@@ -17,6 +19,7 @@ const App = () => {
 
   useGetCurrentUser();
   useGetDoctors();
+  useGetAppointments();
 
   const { userData } = useSelector(state => state.user);
 
@@ -46,6 +49,11 @@ const App = () => {
       />
 
       <Route
+        path='/my-appointments'
+        element={userData  && userData.role === "user" ? <MyAppointments /> : <Navigate to="/signin" />}
+      />
+
+      <Route
         path='/add-doctor'
         element={
           userData && userData.role === "owner"
@@ -62,7 +70,6 @@ const App = () => {
             : <Navigate to="/" />
         }
       />
-
     </Routes>
   )
 }
