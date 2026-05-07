@@ -1,148 +1,153 @@
-import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
-import Navbar from './Navbar'
-import axios from 'axios'
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import React from "react";
+import { useSelector } from "react-redux";
+import Navbar from "./Navbar";
+import { FaTasks } from "react-icons/fa";
+import { MdOutlinePendingActions } from "react-icons/md";
 
 const UserDeshboard = () => {
 
-  const doctors = useSelector(state => state.user?.doctors) || []
+    const projects = useSelector((state) => state.user?.projects) || [];
 
-  const [successMessage, setSuccessMessage] = useState("")
-  const [errorMessage, setErrorMessage] = useState("")
-  const [loadingId, setLoadingId] = useState(null);
+    const getProgress = (project) => {
+        const total = project?.totalTasks ?? 0;
+        const completed = project?.completedTasks ?? 0;
 
-  const handleBooking = async (specialization, doctorId) => {
-    try {
-      setLoadingId(doctorId)
+        return total > 0 ? Math.round((completed / total) * 100) : 0;
+    };
 
-      const res = await axios.post(
-        "http://localhost:8080/api/doctor/book-appointment",
-        { specialization },
-        { withCredentials: true }
-      )
+    return (
+        <div className="w-screen min-h-screen bg-slate-100">
+            <Navbar />
 
-      console.log(res.data); // ✅ fixed
+            <div className="p-8">
 
-      setSuccessMessage(res.data.message)
-      setErrorMessage("")
-
-      setTimeout(() => {
-        setSuccessMessage("")
-      }, 3000)
-
-    } catch (err) {
-      setErrorMessage(err.response?.data?.message || "Booking failed")
-      setSuccessMessage("")
-
-      setTimeout(() => {
-        setErrorMessage("")
-      }, 3000)
-    } finally {
-      setLoadingId(null)
-    }
-  }
-
-  return (
-    <div className='w-screen min-h-screen bg-[#fff9f6]'>
-      <Navbar />
-
-      <div className='p-10'>
-        <h1 className='text-3xl font-bold mb-6 text-center'>
-          Book Appointment
-        </h1>
-
-        {successMessage && (
-          <div className="bg-green-100 text-green-700 px-4 py-3 rounded-lg mb-6 text-center font-medium">
-            {successMessage}
-          </div>
-        )}
-
-        {errorMessage && (
-          <div className="bg-red-100 text-red-700 px-4 py-3 rounded-lg mb-6 text-center font-medium">
-            {errorMessage}
-          </div>
-        )}
-
-        {doctors.length === 0 ? (
-          <p className='text-center text-gray-500'>No Doctors Found</p>
-        ) : (
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {doctors.map((doctor) => {
-
-              const isBusy =
-                doctor.currentAppointments >= doctor.maxDailyPatients
-
-              return (
-                <div
-                  key={doctor._id}
-                  className='bg-white shadow-md rounded-xl p-5 hover:shadow-xl transition'
-                >
-                  <img
-                    src={doctor.image}
-                    alt="doctor"
-                    className='w-full h-48 object-cover rounded-lg mb-4'
-                  />
-
-                  <h2 className='text-xl font-semibold'>
-                    Dr. {doctor.name}
-                  </h2>
-
-                  <p className='text-gray-600'>
-                    {doctor.specialization}
-                  </p>
-
-                  <p className='text-gray-500 text-sm mt-1'>
-                    Experience: {doctor.experience} years
-                  </p>
-
-                  <p className='text-gray-500 text-sm'>
-                    Fee: ₹{doctor.consultationFee}
-                  </p>
-
-                  <p className='text-gray-500 text-sm'>
-                    Appointments: {doctor.currentAppointments} / {doctor.maxDailyPatients}
-                  </p>
-
-                  <div className='mt-4'>
-                    {isBusy ? (
-                      <button
-                        disabled
-                        className='w-full bg-red-100 text-red-600 py-2 rounded-lg cursor-not-allowed'
-                      >
-                        Fully Booked
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() =>
-                          handleBooking(doctor.specialization, doctor._id)
-                        }
-                        disabled={loadingId === doctor._id}
-                        className={`w-full py-2 rounded-lg text-white flex items-center justify-center gap-2 transition ${
-                          loadingId === doctor._id
-                            ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-green-600 hover:bg-green-700"
-                        }`}
-                      >
-                        {loadingId === doctor._id ? (
-                          <>
-                            <AiOutlineLoading3Quarters className="animate-spin text-lg" />
-                            Booking...
-                          </>
-                        ) : (
-                          "Book Appointment"
-                        )}
-                      </button>
-                    )}
-                  </div>
+                
+                <div className="mb-8 text-center">
+                    <h1 className="text-3xl font-bold text-indigo-600">
+                        Member Dashboard
+                    </h1>
+                    <p className="text-gray-500 mt-2">
+                        View your assigned projects and progress
+                    </p>
                 </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
 
-export default UserDeshboard
+          
+                {projects.length === 0 ? (
+                    <div className="bg-white rounded-2xl shadow-md p-10 text-center">
+                        <h2 className="text-2xl font-semibold text-gray-700 mb-2">
+                            No Projects Available
+                        </h2>
+                        <p className="text-gray-500">
+                            Please wait for admin to assign projects
+                        </p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                        {projects.map((project) => {
+
+                            const progress = getProgress(project);
+
+                            const total = project?.totalTasks ?? 0;
+                            const completed = project?.completedTasks ?? 0;
+                            const pending = Math.max(total - completed, 0);
+
+                            return (
+                                <div
+                                    key={project._id}
+                                    className="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition"
+                                >
+
+                                    {/* Title */}
+                                    <div className="flex items-center justify-between mb-4">
+
+                                        <h2 className="text-xl font-semibold text-gray-800">
+                                            {project?.projectName || "Untitled Project"}
+                                        </h2>
+
+                                        <span
+                                            className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                                progress === 100
+                                                    ? "bg-green-100 text-green-700"
+                                                    : progress >= 50
+                                                    ? "bg-yellow-100 text-yellow-700"
+                                                    : "bg-red-100 text-red-700"
+                                            }`}
+                                        >
+                                            {progress}% Done
+                                        </span>
+
+                                    </div>
+
+                                  
+                                    <p className="text-gray-500 text-sm mb-5 line-clamp-3">
+                                        {project?.description || "No description available"}
+                                    </p>
+
+                                  
+                                    <div className="space-y-3 mb-5">
+
+                                        <div className="flex items-center gap-3 text-gray-700">
+                                            <FaTasks className="text-indigo-600" />
+                                            <span>
+                                                Total Tasks: <strong>{total}</strong>
+                                            </span>
+                                        </div>
+
+                                        <div className="flex items-center gap-3 text-gray-700">
+                                            <MdOutlinePendingActions className="text-orange-500" />
+                                            <span>
+                                                Pending Tasks: <strong>{pending}</strong>
+                                            </span>
+                                        </div>
+
+                                    </div>
+
+                                    
+                                    <div className="mb-5">
+                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                            <div
+                                                className="bg-indigo-600 h-2 rounded-full"
+                                                style={{ width: `${progress}%` }}
+                                            />
+                                        </div>
+                                    </div>
+
+                              
+                                    <div className="flex items-center justify-between">
+
+                                        <div>
+                                            <p className="text-sm text-gray-500">
+                                                Team Members
+                                            </p>
+                                            <p className="font-semibold text-gray-700">
+                                                {project?.members?.length ?? 0}
+                                            </p>
+                                        </div>
+
+                                        <div>
+                                            <p className="text-sm text-gray-500">
+                                                Deadline
+                                            </p>
+                                            <p className="font-semibold text-gray-700">
+                                                {project?.deadline
+                                                    ? new Date(project.deadline).toLocaleDateString()
+                                                    : "No Deadline"}
+                                            </p>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            );
+                        })}
+
+                    </div>
+                )}
+
+            </div>
+        </div>
+    );
+};
+
+export default UserDeshboard;

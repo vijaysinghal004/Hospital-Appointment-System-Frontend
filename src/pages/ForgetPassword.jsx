@@ -1,182 +1,388 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
-import { IoEye } from "react-icons/io5";
-import { IoMdEyeOff } from "react-icons/io";
+import { IoEye, IoEyeOff } from "react-icons/io5";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import axios from 'axios';
-
+import { serverUrl } from '../App';
 
 const ForgetPassword = () => {
+
     const [step, setStep] = useState(1);
-    const primaryColor = '#2563EB'
-    const hoverColor = '#1E40AF'
-    const bgColor = '#EFF6FF'
-    const borderColor = '#E5E7EB'
+
     const [email, setEmail] = useState("");
     const [otp, setOtp] = useState("");
-    const [showNewPassword, setshowNewPassword] = useState(false);
-    const [showConfirmPassword, setshowConfirmPassword] = useState(false);
+
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+
     const [isLoading1, setIsLoading1] = useState(false);
     const [isLoading2, setIsLoading2] = useState(false);
     const [isLoading3, setIsLoading3] = useState(false);
-    const [err,setErr]=useState("");
+
+    const [err, setErr] = useState("");
+
     const navigate = useNavigate();
 
-
     const handleSendOtp = async () => {
+
         if (!email) {
-            setErr("email is required");
-            // alert("Email is required");
+            setErr("Email is required");
             return;
         }
+
         try {
+
             setIsLoading1(true);
-            const result = await axios.post("http://localhost:8080/api/auth/send-otp", { email }, { withCredentials: true })
-            console.log(result);
+
+            await axios.post(
+                `${serverUrl}/api/auth/send-otp`,
+                {
+                    email
+                },
+                {
+                    withCredentials: true
+                }
+            );
+
             setErr("");
+
             setStep(2);
+
         } catch (err) {
+
             setErr(err?.response?.data?.message);
-            // alert(err?.response?.data?.message);
-            console.log(err?.response?.data.message);
+
         } finally {
+
             setIsLoading1(false);
+
         }
-    }
+    };
 
     const handleVerifyOtp = async () => {
-        // if (!otp || otp.length !== 4) {
-        //     alert("Enter valid 4 digit OTP");
-        //     return;
-        // }
+
         try {
+
             setIsLoading2(true);
-            const result = await axios.post("http://localhost:8080/api/auth/verify-otp", { email, otp }, { withCredentials: true })
-            console.log(result);
+
+            await axios.post(
+               `${serverUrl}/api/auth/verify-otp`,
+                {
+                    email,
+                    otp
+                },
+                {
+                    withCredentials: true
+                }
+            );
+
             setErr("");
+
             setStep(3);
+
         } catch (err) {
+
             setErr(err?.response?.data?.message);
-            // alert(err?.response?.data?.message);
-            console.log(err.response.data.message);
+
         } finally {
+
             setIsLoading2(false);
+
         }
-    }
+    };
+
     const handleResetPassword = async () => {
-        // if (!newPassword || !confirmPassword) {
-        //     alert("All fields required");
-        //     return;
-        // }
-        // if (newPassword != confirmPassword) {
-        //     alert("password does not match")
-        //     return null;
-        // }
-        try {
-            setIsLoading3(true);
-            const result = await axios.post("http://localhost:8080/api/auth/reset-password", { email, newPassword, confirmPassword }, { withCredentials: true })
-            console.log(result);
-            setEmail("");
-            setErr("");
-            navigate("/signIn")
-        } catch (err) {
-            setErr(err?.response?.data?.message);
-            // alert(err?.response?.data?.message);
-            console.log(err.message);
-        } finally {
-            setIsLoading3(false);
+
+        if (newPassword !== confirmPassword) {
+
+            setErr("Passwords do not match");
+
+            return;
         }
-    }
+
+        try {
+
+            setIsLoading3(true);
+
+            await axios.post(
+                `${serverUrl}/api/auth/reset-password`,
+                {
+                    email,
+                    newPassword,
+                    confirmPassword
+                },
+                {
+                    withCredentials: true
+                }
+            );
+
+            setEmail("");
+
+            setOtp("");
+
+            setNewPassword("");
+
+            setConfirmPassword("");
+
+            setErr("");
+
+            navigate("/signin");
+
+        } catch (err) {
+
+            setErr(err?.response?.data?.message);
+
+        } finally {
+
+            setIsLoading3(false);
+
+        }
+    };
 
     return (
 
-        <div className='min-h-screen flex items-center  justify-center p-3' style={{ backgroundColor: bgColor }}>
-            <div className={`bg-white rounded-xl shadow-lg w-full max-w-md p-4 `} style={{ border: `1px solid ${borderColor}` }}>
-                <div className='flex items-center gap-4 m-4'>
-                    <FaArrowLeftLong size={20} className='text-[#2563EB] cursor-pointer ' onClick={() => navigate(-1)} />
-                    <h1 className='text-2xl font-bold mb-1' style={{ color: `${primaryColor}` }}> Forget Password</h1>
+        <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4">
+
+            <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-8">
+
+                <div className="flex items-center gap-4 mb-6">
+
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="text-indigo-600 hover:text-indigo-700"
+                    >
+                        <FaArrowLeftLong size={20} />
+                    </button>
+
+                    <div>
+
+                        <h1 className="text-2xl font-bold text-indigo-600">
+                            Forgot Password
+                        </h1>
+
+                        <p className="text-gray-500 text-sm mt-1">
+                            Reset your password securely
+                        </p>
+
+                    </div>
 
                 </div>
-                {step == 1 &&
-                    <div>
-                        <div className='mb-6'>
-                            <label htmlFor="email" className='block text-gray-700 font-medium mb-1'>Email</label>
-                            <input id="email" type="email" className='w-full border rounded-lg px-3 py-2 focus:outline-none focus:border-orange-500' value={email} onChange={(e) => setEmail(e.target.value)} placeholder='Enter your email' style={{ border: `1px solid ${borderColor}` }} />
-                        </div>
-                        <p className='text-red-400 text-center underline'>
-                            {err}
-                        </p>
-                        <button
-                            type='button'
-                            className={`text-center w-full border rounded-lg mt-4 px-4 py-2 flex justify-center gap-2  transition duration-200 bg-[#4385db] hover:bg-[#1E40AF] text-white cursor-pointer disabled:opacity-70`}
-                            onClick={handleSendOtp}
-                            disabled={isLoading1}
-                        >
-                            {isLoading1 && <AiOutlineLoading3Quarters size={20} className=' mt-1 center animate-spin flex justify-center items-center' />}
-                            {!isLoading1 ? "Send Otp" : "Sending Otp "}
-                        </button>
-                    </div>
-                }
-                {step == 2 &&
-                    <div>
-                        <div className='mb-6'>
-                            <label htmlFor="otp" className='block text-gray-700 font-medium mb-1'> Enter Otp</label>
-                            <input id="otp" type="text" className='w-full border rounded-lg px-3 py-2 focus:outline-none focus:border-orange-500' value={otp} onChange={(e) => setOtp(e.target.value)} placeholder='Enter 6 digits Otp' style={{ border: `1px solid ${borderColor}` }} />
-                        </div>
-                           <p className='text-red-400 text-center underline'>
-                            {err}
-                        </p>
-                        <button
-                            type='button'
-                            className={`text-center w-full border rounded-lg mt-4 px-4 py-2 flex justify-center gap-2  transition duration-200 bg-[#2563EB] hover:bg-[#1E40AF] text-white cursor-pointer disabled:opacity-70`}
-                            onClick={handleVerifyOtp}
-                            disabled={isLoading2}
-                        >
-                            {isLoading2 && <AiOutlineLoading3Quarters size={20} className=' mt-1 center animate-spin flex justify-center items-center' />}
-                            {!isLoading2 ? "Verify" : "Verifying... "}
 
-                        </button>
-                    </div>
-                }
-                {step == 3 &&
-                    <div>
-                        <div className='mb-3'>
-                            <label htmlFor="newPassword" className='block text-gray-600 font-medium mb-1'>New Password</label>
-                            <div className='relative'>
-                                <input id="newPassword" type={showNewPassword ? "text" : "password"} className='w-full border rounded-lg px-3 py-2 focus:outline-none focus:border-orange-500' placeholder='Enter New password' value={newPassword} onChange={(e) => setNewPassword(e.target.value)} style={{ border: `1px solid ${borderColor}` }} />
-                                <button className='absolute right-3 top-3 text-gray-500' onClick={() => setshowNewPassword(prev => !prev)}>{!showNewPassword ? <IoEye /> : <IoMdEyeOff />}</button>
+                {
+                    step === 1 && (
+
+                        <div>
+
+                            <div className="mb-5">
+
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Email
+                                </label>
+
+                                <input
+                                    type="email"
+                                    placeholder="Enter your email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500"
+                                />
+
                             </div>
-                        </div>
-                        <div className='mb-3'>
-                            <label htmlFor="confirmPassword" className='block text-gray-600 font-medium mb-1'>Confirm Password</label>
-                            <div className='relative'>
-                                <input id="confirmPassword" type={showConfirmPassword ? "text" : "password"} className='w-full border rounded-lg px-3 py-2 focus:outline-none focus:border-orange-500' placeholder='Confirm password' value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} style={{ border: `1px solid ${borderColor}` }} />
-                                <button className='absolute right-3 top-3 text-gray-500' onClick={() => setshowConfirmPassword(prev => !prev)}>{!showConfirmPassword ? <IoEye /> : <IoMdEyeOff />}</button>
-                            </div>
-                        </div>
-                           <p className='text-red-400 text-center underline'>
-                            {err}
-                        </p>
-                        <button
-                            type='button'
-                            className={`text-center w-full border rounded-lg mt-4 px-4 py-2 flex justify-center gap-2  transition duration-200 bg-[#2563EB] hover:bg-[#1E40AF] text-white cursor-pointer disabled:opacity-70`}
-                            onClick={handleResetPassword}
-                            disabled={isLoading3}
-                        >
-                            {isLoading3 && <AiOutlineLoading3Quarters size={20} className=' mt-1 center animate-spin flex justify-center items-center' />}
-                            {!isLoading3 ? "Reset Password" : "Resetting..."}
-                        </button>
-                    </div>
 
+                            {
+                                err && (
+                                    <p className="text-red-500 text-sm text-center mb-3">
+                                        {err}
+                                    </p>
+                                )
+                            }
 
+                            <button
+                                type="button"
+                                onClick={handleSendOtp}
+                                disabled={isLoading1}
+                                className="w-full bg-indigo-600 hover:bg-indigo-700 transition text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 disabled:opacity-70"
+                            >
+
+                                {
+                                    isLoading1 &&
+                                    <AiOutlineLoading3Quarters className="animate-spin" />
+                                }
+
+                                {
+                                    !isLoading1
+                                        ? "Send OTP"
+                                        : "Sending OTP..."
+                                }
+
+                            </button>
+
+                        </div>
+                    )
                 }
+
+                {
+                    step === 2 && (
+
+                        <div>
+
+                            <div className="mb-5">
+
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Enter OTP
+                                </label>
+
+                                <input
+                                    type="text"
+                                    placeholder="Enter 6 digit OTP"
+                                    value={otp}
+                                    onChange={(e) => setOtp(e.target.value)}
+                                    className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500"
+                                />
+
+                            </div>
+
+                            {
+                                err && (
+                                    <p className="text-red-500 text-sm text-center mb-3">
+                                        {err}
+                                    </p>
+                                )
+                            }
+
+                            <button
+                                type="button"
+                                onClick={handleVerifyOtp}
+                                disabled={isLoading2}
+                                className="w-full bg-indigo-600 hover:bg-indigo-700 transition text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 disabled:opacity-70"
+                            >
+
+                                {
+                                    isLoading2 &&
+                                    <AiOutlineLoading3Quarters className="animate-spin" />
+                                }
+
+                                {
+                                    !isLoading2
+                                        ? "Verify OTP"
+                                        : "Verifying..."
+                                }
+
+                            </button>
+
+                        </div>
+                    )
+                }
+
+                {
+                    step === 3 && (
+
+                        <div>
+
+                            <div className="mb-4">
+
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    New Password
+                                </label>
+
+                                <div className="relative">
+
+                                    <input
+                                        type={showNewPassword ? "text" : "password"}
+                                        placeholder="Enter new password"
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500"
+                                    />
+
+                                    <button
+                                        type="button"
+                                        className="absolute right-4 top-4 text-gray-500"
+                                        onClick={() => setShowNewPassword(!showNewPassword)}
+                                    >
+                                        {
+                                            showNewPassword
+                                                ? <IoEyeOff />
+                                                : <IoEye />
+                                        }
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                            <div className="mb-5">
+
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Confirm Password
+                                </label>
+
+                                <div className="relative">
+
+                                    <input
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        placeholder="Confirm password"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500"
+                                    />
+
+                                    <button
+                                        type="button"
+                                        className="absolute right-4 top-4 text-gray-500"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    >
+                                        {
+                                            showConfirmPassword
+                                                ? <IoEyeOff />
+                                                : <IoEye />
+                                        }
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                            {
+                                err && (
+                                    <p className="text-red-500 text-sm text-center mb-3">
+                                        {err}
+                                    </p>
+                                )
+                            }
+
+                            <button
+                                type="button"
+                                onClick={handleResetPassword}
+                                disabled={isLoading3}
+                                className="w-full bg-indigo-600 hover:bg-indigo-700 transition text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 disabled:opacity-70"
+                            >
+
+                                {
+                                    isLoading3 &&
+                                    <AiOutlineLoading3Quarters className="animate-spin" />
+                                }
+
+                                {
+                                    !isLoading3
+                                        ? "Reset Password"
+                                        : "Resetting..."
+                                }
+
+                            </button>
+
+                        </div>
+                    )
+                }
+
             </div>
 
         </div>
-    )
-}
+    );
+};
 
-export default ForgetPassword
+export default ForgetPassword;
